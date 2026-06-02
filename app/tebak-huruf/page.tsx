@@ -187,7 +187,9 @@ export default function TebakHurufPage() {
         {/* Nama Melayu Riau */}
         <div className="text-xs text-gray-400 font-bold mb-3">
           Melayu Riau:{" "}
-          <span className="text-gray-600 font-black">{current.namaMelayu}</span>
+          <span className="text-gray-600 font-black">
+            {current.namaMelayu ?? current.nama}
+          </span>
         </div>
 
         {/* Kata dengan huruf kosong */}

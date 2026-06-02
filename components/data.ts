@@ -2,6 +2,7 @@
 export interface AnggotaTubuh {
   id: number;
   nama: string; // Nama Indonesia
+  namaMelayu?: string; // Nama Melayu Riau
   emoji: string;
   deskripsi: string;
   sukuKata: string[]; // Suku kata untuk mengeja
