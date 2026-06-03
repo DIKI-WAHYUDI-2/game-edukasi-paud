@@ -161,8 +161,10 @@ export default function TebakHurufPage() {
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+        background: "url('/pictures/background.png') center/cover no-repeat",
       }}>
+      {/* Overlay */}
+      <div className="absolute inset-0" style={{ background: "rgba(106,17,203,0.7)" }} />
       {/* Confetti */}
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">

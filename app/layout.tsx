@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import { BacksoundProvider } from "../components/BacksoundContext";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="id" className={`h-full ${nunito.className}`}>
       <body className="min-h-full flex flex-col">
-        {children}
+        <BacksoundProvider>
+          {children}
+        </BacksoundProvider>
       </body>
     </html>
   );

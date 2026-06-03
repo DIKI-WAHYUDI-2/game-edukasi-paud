@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { hurufVokalData } from "../../components/data";
 import PopupSelesai from "../../components/PopupSelesai";
 
+import { useBacksound } from "../../components/BacksoundContext";
+
 // Helper: kalau emoji berupa path gambar (mulai dengan /), render <img>, kalau tidak render teks
 function EmojiOrImage({ value, size = 32 }: { value: string; size?: number }) {
   if (value.startsWith("/")) {
@@ -27,19 +29,24 @@ export default function HurufVokalPage() {
   const [sudahDiputar, setSudahDiputar] = useState<Set<string>>(new Set());
   const [selesai, setSelesai] = useState(false);
 
+  const { duck, unduck } = useBacksound();
+
   const playSound = (huruf: string) => {
     if (isPlaying) return;
     setActiveHuruf(huruf);
     setIsPlaying(true);
+    duck();
 
     const audio = new Audio(`/voices/Huruf ${huruf.toUpperCase()}.mp3`);
     audio.play().catch(() => {
       setIsPlaying(false);
+      unduck();
       setTimeout(() => setActiveHuruf(null), 300);
     });
 
     audio.onended = () => {
       setIsPlaying(false);
+      unduck();
       setTimeout(() => setActiveHuruf(null), 300);
       // Tandai huruf ini sudah diputar
       setSudahDiputar((prev) => {
@@ -69,8 +76,10 @@ export default function HurufVokalPage() {
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "url('/pictures/background.png') center/cover no-repeat",
       }}>
+      {/* Overlay */}
+      <div className="absolute inset-0" style={{ background: "rgba(102,126,234,0.7)" }} />
       {/* Dekorasi */}
       <div className="absolute inset-0 pointer-events-none">
         {["🔤", "📝", "✏️", "📚", "🎨"].map((icon, i) => (

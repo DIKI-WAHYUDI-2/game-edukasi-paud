@@ -48,8 +48,10 @@ export default function AnggotaTubuhPage() {
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+        background: "url('/pictures/background.png') center/cover no-repeat",
       }}>
+      {/* Overlay */}
+      <div className="absolute inset-0" style={{ background: "rgba(17,153,142,0.7)" }} />
       {/* Header */}
       <div className="relative z-10 text-center mb-4">
         <div className="text-4xl mb-1 animate-bounce-gentle">🫀</div>

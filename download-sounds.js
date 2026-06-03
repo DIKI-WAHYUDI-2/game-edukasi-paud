@@ -5,58 +5,73 @@ const path = require("path");
 const outputDir = path.join(__dirname, "public", "sounds");
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-const words = [
+const voicesDir = path.join(__dirname, "public", "voices");
+if (!fs.existsSync(voicesDir)) fs.mkdirSync(voicesDir, { recursive: true });
+
+const soundWords = [
   // Anggota tubuh
-  { text: "tenggorokan", file: "tenggorokan" },
-  { text: "bokong", file: "bokong" },
-  { text: "otot", file: "otot" },
-  { text: "otak", file: "otak" },
-  { text: "kepala", file: "kepala" },
-  { text: "tangan", file: "tangan" },
-  { text: "mata", file: "mata" },
-  { text: "kaki", file: "kaki" },
+  { text: "tenggorokan", file: "tenggorokan", dir: outputDir },
+  { text: "bokong", file: "bokong", dir: outputDir },
+  { text: "otot", file: "otot", dir: outputDir },
+  { text: "otak", file: "otak", dir: outputDir },
+  { text: "kepala", file: "kepala", dir: outputDir },
+  { text: "tangan", file: "tangan", dir: outputDir },
+  { text: "mata", file: "mata", dir: outputDir },
+  { text: "kaki", file: "kaki", dir: outputDir },
   // Suku kata
-  { text: "teng", file: "teng" },
-  { text: "go", file: "go" },
-  { text: "ro", file: "ro" },
-  { text: "kan", file: "kan" },
-  { text: "bo", file: "bo" },
-  { text: "kong", file: "kong" },
-  { text: "o", file: "o" },
-  { text: "tot", file: "tot" },
-  { text: "tak", file: "tak" },
-  { text: "ke", file: "ke" },
-  { text: "pa", file: "pa" },
-  { text: "la", file: "la" },
-  { text: "ngan", file: "ngan" },
-  { text: "ta", file: "ta" },
-  { text: "ma", file: "ma" },
-  { text: "ki", file: "ki" },
-  { text: "ka", file: "ka" },
+  { text: "teng", file: "teng", dir: outputDir },
+  { text: "go", file: "go", dir: outputDir },
+  { text: "ro", file: "ro", dir: outputDir },
+  { text: "kan", file: "kan", dir: outputDir },
+  { text: "bo", file: "bo", dir: outputDir },
+  { text: "kong", file: "kong", dir: outputDir },
+  { text: "o", file: "o", dir: outputDir },
+  { text: "tot", file: "tot", dir: outputDir },
+  { text: "tak", file: "tak", dir: outputDir },
+  { text: "ke", file: "ke", dir: outputDir },
+  { text: "pa", file: "pa", dir: outputDir },
+  { text: "la", file: "la", dir: outputDir },
+  { text: "ngan", file: "ngan", dir: outputDir },
+  { text: "ta", file: "ta", dir: outputDir },
+  { text: "ma", file: "ma", dir: outputDir },
+  { text: "ki", file: "ki", dir: outputDir },
+  { text: "ka", file: "ka", dir: outputDir },
   // Feedback
-  { text: "Hebat! Jawabanmu benar!", file: "benar" },
-  { text: "Coba lagi ya!", file: "salah" },
+  { text: "Hebat! Jawabanmu benar!", file: "benar", dir: outputDir },
+  { text: "Coba lagi ya!", file: "salah", dir: outputDir },
   // Kata utuh untuk mengeja
-  { text: "jadi... tenggorokan", file: "jadi-tenggorokan" },
-  { text: "jadi... bokong", file: "jadi-bokong" },
-  { text: "jadi... otot", file: "jadi-otot" },
-  { text: "jadi... otak", file: "jadi-otak" },
-  { text: "jadi... kepala", file: "jadi-kepala" },
-  { text: "jadi... tangan", file: "jadi-tangan" },
-  { text: "jadi... mata", file: "jadi-mata" },
-  { text: "jadi... kaki", file: "jadi-kaki" },
+  { text: "jadi... tenggorokan", file: "jadi-tenggorokan", dir: outputDir },
+  { text: "jadi... bokong", file: "jadi-bokong", dir: outputDir },
+  { text: "jadi... otot", file: "jadi-otot", dir: outputDir },
+  { text: "jadi... otak", file: "jadi-otak", dir: outputDir },
+  { text: "jadi... kepala", file: "jadi-kepala", dir: outputDir },
+  { text: "jadi... tangan", file: "jadi-tangan", dir: outputDir },
+  { text: "jadi... mata", file: "jadi-mata", dir: outputDir },
+  { text: "jadi... kaki", file: "jadi-kaki", dir: outputDir },
+  // === Navigasi ===
+  { text: "Mulai bermain!", file: "mulai-bermain", dir: voicesDir },
+  { text: "Pilih permainan!", file: "pilih-permainan", dir: voicesDir },
+  { text: "Ayo, kenali huruf-huruf vokal!", file: "ayo-huruf-vokal", dir: voicesDir },
+  { text: "Ayo, kenali anggota tubuh!", file: "ayo-anggota-tubuh", dir: voicesDir },
+  { text: "Ayo, belajar mengeja kata!", file: "ayo-mengeja-kata", dir: voicesDir },
+  { text: "Ayo, belajar tebak huruf yang hilang!", file: "ayo-tebak-huruf", dir: voicesDir },
 ];
 
-function download(text, filename) {
+function download(text, filename, dir) {
   return new Promise((resolve, reject) => {
     const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=id&client=tw-ob`;
-    const dest = path.join(outputDir, `${filename}.mp3`);
+    const dest = path.join(dir, `${filename}.mp3`);
+
+    // Skip kalau file sudah ada
+    if (fs.existsSync(dest)) {
+      console.log(`— skip (sudah ada): ${filename}.mp3`);
+      resolve();
+      return;
+    }
 
     const file = fs.createWriteStream(dest);
     const req = https.get(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-      },
+      headers: { "User-Agent": "Mozilla/5.0" },
     }, (res) => {
       if (res.statusCode !== 200) {
         reject(new Error(`HTTP ${res.statusCode} untuk "${text}"`));
@@ -79,11 +94,10 @@ function download(text, filename) {
 }
 
 async function downloadAll() {
-  console.log(`Menyimpan audio ke: ${outputDir}\n`);
-  for (const item of words) {
+  console.log("Mengunduh audio...\n");
+  for (const item of soundWords) {
     try {
-      await download(item.text, item.file);
-      // Jeda kecil supaya tidak dianggap spam
+      await download(item.text, item.file, item.dir);
       await new Promise((r) => setTimeout(r, 300));
     } catch (err) {
       console.error(`✗ Gagal: ${item.file} — ${err.message}`);
