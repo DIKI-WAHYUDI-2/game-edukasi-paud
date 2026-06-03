@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBacksound } from "../components/BacksoundContext";
 import { useTTS } from "../components/useTTS";
@@ -45,19 +45,33 @@ export default function HomePage() {
   const router = useRouter();
   const { play } = useBacksound();
   const { speak } = useTTS();
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const handleMulai = async () => {
+    setIsSpeaking(true);
+    // 1. Putar sambutan
+    await new Promise<void>((resolve) => {
+      const sambutan = new Audio("/voices/sambutan-home.mp3");
+      sambutan.onended = () => resolve();
+      sambutan.onerror = () => resolve();
+      sambutan.play().catch(() => resolve());
+    });
+    // 2. Jeda sebentar
+    await new Promise((r) => setTimeout(r, 400));
+    // 3. Putar "mulai bermain"
+    await new Promise<void>((resolve) => {
+      const mulai = new Audio("/voices/mulai-bermain.mp3");
+      mulai.onended = () => resolve();
+      mulai.onerror = () => resolve();
+      mulai.play().catch(() => resolve());
+    });
+    // 4. Pindah ke menu
     play();
-    await speak("Mulai bermain!");
     router.push("/menu");
   };
 
   useEffect(() => {
-    // Putar suara sambutan saat halaman pertama kali dibuka
-    const audio = new Audio("/voices/sambutan-home.mp3");
-    audio.play().catch(() => {
-      // Jika browser blokir autoplay, diam saja
-    });
+    // Autoplay diblokir browser sebelum ada interaksi — dibiarkan kosong
   }, []);
 
   return (
@@ -114,10 +128,11 @@ export default function HomePage() {
         {/* Tombol Mulai */}
         <button
           onClick={handleMulai}
+          disabled={isSpeaking}
           className="btn-game px-10 py-4 rounded-2xl text-white font-black text-lg shadow-lg flex items-center justify-center gap-2"
           style={{
-            background: "#2D6A4F",
-            boxShadow: "0 6px 0 #1B4332",
+            background: isSpeaking ? "#aaa" : "#2D6A4F",
+            boxShadow: isSpeaking ? "0 6px 0 #888" : "0 6px 0 #1B4332",
             letterSpacing: "0.08em",
             minWidth: 240,
           }}
