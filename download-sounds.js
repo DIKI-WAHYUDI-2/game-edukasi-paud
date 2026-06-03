@@ -51,6 +51,7 @@ const soundWords = [
   // === Navigasi ===
   { text: "Mulai bermain!", file: "mulai-bermain", dir: voicesDir },
   { text: "Pilih permainan!", file: "pilih-permainan", dir: voicesDir },
+  { text: "Yuk, Kenali Huruf Vokal dan Bagian Tubuh Kita!", file: "sambutan-home", dir: voicesDir },
   { text: "Ayo, kenali huruf-huruf vokal!", file: "ayo-huruf-vokal", dir: voicesDir },
   { text: "Ayo, kenali anggota tubuh!", file: "ayo-anggota-tubuh", dir: voicesDir },
   { text: "Ayo, belajar mengeja kata!", file: "ayo-mengeja-kata", dir: voicesDir },

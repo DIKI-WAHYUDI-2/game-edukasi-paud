@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useBacksound } from "../components/BacksoundContext";
 import { useTTS } from "../components/useTTS";
@@ -46,13 +47,21 @@ export default function HomePage() {
   const { speak } = useTTS();
 
   const handleMulai = async () => {
-    play(); // start backsound (backsound akan duck otomatis saat speak)
+    play();
     await speak("Mulai bermain!");
     router.push("/menu");
   };
 
+  useEffect(() => {
+    // Putar suara sambutan saat halaman pertama kali dibuka
+    const audio = new Audio("/voices/sambutan-home.mp3");
+    audio.play().catch(() => {
+      // Jika browser blokir autoplay, diam saja
+    });
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="h-screen flex flex-col items-center justify-center relative overflow-hidden">
       <MotiefBackground />
 
       {/* Border atas */}
@@ -66,22 +75,29 @@ export default function HomePage() {
         <div style={{ height: 12, background: "#2D6A4F", opacity: 0.85 }} />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-16 max-w-lg w-full">
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 w-full" style={{ maxWidth: 520 }}>
 
-        <div className="mb-1" style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.15))" }}>
-          <img src="/pictures/rumah.png" alt="Rumah Melayu" width={80} height={80} style={{ objectFit: "contain" }} />
+        {/* Ilustrasi rumah + karakter */}
+        <div className="flex items-end justify-center mb-3">
+          <img
+            src="/pictures/rumah dan orang.png"
+            alt="Rumah Melayu dengan Bujang dan Dara"
+            className="animate-bounce-gentle"
+            style={{
+              width: "min(360px, 72vw)",
+              objectFit: "contain",
+              filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.2))",
+              animationDelay: "0s",
+            }}
+          />
         </div>
 
-        <div className="flex gap-4 justify-center mb-6">
-          <img src="/pictures/tanjak.png" alt="Bujang" width={80} height={80} className="animate-bounce-gentle" style={{ objectFit: "contain", animationDelay: "0s" }} />
-          <img src="/pictures/sunting.png" alt="Dara" width={80} height={80} className="animate-bounce-gentle" style={{ objectFit: "contain", animationDelay: "0.3s" }} />
-        </div>
-
+        {/* Judul */}
         <h1
-          className="font-black leading-tight mb-3"
+          className="font-black leading-tight mb-2"
           style={{
             color: "#7B2D00",
-            fontSize: "clamp(1.8rem, 6vw, 2.8rem)",
+            fontSize: "clamp(1rem, 3vw, 1.6rem)",
             textTransform: "uppercase",
             letterSpacing: "0.02em",
             textShadow: "0 2px 4px rgba(0,0,0,0.08)",
@@ -90,30 +106,31 @@ export default function HomePage() {
           Yuk, Kenali Huruf Vokal dan Bagian Tubuh Kita!
         </h1>
 
-        <p className="text-base font-semibold mb-10" style={{ color: "#555", letterSpacing: "0.01em" }}>
+        {/* Subjudul */}
+        <p className="text-sm font-semibold mb-5" style={{ color: "#555", letterSpacing: "0.01em" }}>
           Petualangan Bujang &amp; Dara &mdash; Nuansa Melayu Riau Siak
         </p>
 
-        {/* Tombol Mulai dengan panah berkelap-kelip */}
+        {/* Tombol Mulai */}
         <button
           onClick={handleMulai}
-          className="btn-game px-10 py-5 rounded-2xl text-white font-black text-xl shadow-lg flex items-center justify-center gap-2"
+          className="btn-game px-10 py-4 rounded-2xl text-white font-black text-lg shadow-lg flex items-center justify-center gap-2"
           style={{
             background: "#2D6A4F",
             boxShadow: "0 6px 0 #1B4332",
             letterSpacing: "0.08em",
-            minWidth: 260,
+            minWidth: 240,
           }}
         >
           MULAI BERMAIN!
           <span className="flex items-center" style={{ marginLeft: 4 }}>
-            <span className="animate-arrow-blink" style={{ animationDelay: "0s",    fontSize: 22, color: "#FFD700" }}>▶</span>
-            <span className="animate-arrow-blink" style={{ animationDelay: "0.25s", fontSize: 22, color: "#FFD700" }}>▶</span>
-            <span className="animate-arrow-blink" style={{ animationDelay: "0.5s",  fontSize: 22, color: "#FFD700" }}>▶</span>
+            <span className="animate-arrow-blink" style={{ animationDelay: "0s",    fontSize: 20, color: "#FFD700" }}>▶</span>
+            <span className="animate-arrow-blink" style={{ animationDelay: "0.25s", fontSize: 20, color: "#FFD700" }}>▶</span>
+            <span className="animate-arrow-blink" style={{ animationDelay: "0.5s",  fontSize: 20, color: "#FFD700" }}>▶</span>
           </span>
         </button>
 
-        <p className="mt-10 text-sm font-semibold" style={{ color: "#8B6914" }}>
+        <p className="mt-4 text-xs font-semibold" style={{ color: "#8B6914" }}>
           Game Edukasi PAUD &bull; Budaya Melayu Riau
         </p>
       </div>

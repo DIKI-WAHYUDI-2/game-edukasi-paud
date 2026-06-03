@@ -66,8 +66,8 @@ export default function MengejaKataPage() {
       {/* Header */}
       <div className="relative z-10 text-center mb-4">
         <div className="text-4xl mb-1 animate-bounce-gentle">📖</div>
-        <h1 className="text-2xl font-black text-white">Mengeja Kata</h1>
-        <p className="text-pink-100 text-sm font-semibold">
+        <h1 className="text-2xl font-black" style={{ color: "#6B0F6B" }}>Mengeja Kata</h1>
+        <p className="text-sm font-semibold" style={{ color: "#8B1A8B" }}>
           {currentIndex + 1} / {anggotaTubuhData.length} — Klik suku kata!
         </p>
       </div>
@@ -75,7 +75,7 @@ export default function MengejaKataPage() {
       {/* Progress */}
       <div
         className="relative z-10 w-full max-w-sm h-3 rounded-full mb-6 overflow-hidden"
-        style={{ background: "rgba(255,255,255,0.3)" }}>
+        style={{ background: "rgba(255,255,255,0.55)" }}>
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{
@@ -179,9 +179,10 @@ export default function MengejaKataPage() {
       <button
         onClick={() => !isPlaying && router.push("/menu")}
         disabled={isPlaying}
-        className="btn-game mt-5 relative z-10 px-6 py-3 rounded-full font-bold text-white text-sm"
+        className="btn-game mt-5 relative z-10 px-6 py-3 rounded-full font-bold text-sm"
         style={{
-          background: isPlaying ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.2)",
+          background: isPlaying ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.15)",
+          color: isPlaying ? "#aaa" : "#6B0F6B",
           opacity: isPlaying ? 0.5 : 1,
           cursor: isPlaying ? "not-allowed" : "pointer",
         }}>

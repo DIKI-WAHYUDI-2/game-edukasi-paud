@@ -79,7 +79,10 @@ export default function HurufVokalPage() {
         background: "url('/pictures/background.png') center/cover no-repeat",
       }}>
       {/* Overlay */}
-      <div className="absolute inset-0" style={{ background: "rgba(102,126,234,0.7)" }} />
+      <div
+        className="absolute inset-0"
+        style={{ background: "rgba(255,255,255,0.55)" }}
+      />
       {/* Dekorasi */}
       <div className="absolute inset-0 pointer-events-none">
         {["🔤", "📝", "✏️", "📚", "🎨"].map((icon, i) => (
@@ -100,8 +103,8 @@ export default function HurufVokalPage() {
       {/* Header */}
       <div className="relative z-10 text-center mb-6">
         <div className="text-5xl mb-2 animate-bounce-gentle">🔤</div>
-        <h1 className="text-3xl font-black text-white">Huruf Vokal</h1>
-        <p className="text-purple-200 mt-1 font-semibold text-sm">
+        <h1 className="text-3xl font-black" style={{ color: "#4A1060" }}>Huruf Vokal</h1>
+        <p className="mt-1 font-semibold text-sm" style={{ color: "#6B2D87" }}>
           Klik huruf untuk dengar bunyinya!
         </p>
       </div>
@@ -123,10 +126,15 @@ export default function HurufVokalPage() {
                   ? `0 2px 0 ${item.warnaGelap}, 0 0 20px ${item.warna}`
                   : `0 6px 0 ${item.warnaGelap}`,
               transform: activeHuruf === item.huruf ? "translateY(4px)" : "",
-              outline: sudahDiputar.has(item.huruf) ? "3px solid white" : "none",
+              outline: sudahDiputar.has(item.huruf)
+                ? "3px solid white"
+                : "none",
             }}>
             <span className="text-4xl">{item.huruf}</span>
-            <EmojiOrImage value={item.emoji} size={item.emoji.startsWith('/') ? 52 : 28} />
+            <EmojiOrImage
+              value={item.emoji}
+              size={item.emoji.startsWith("/") ? 52 : 28}
+            />
           </button>
         ))}
       </div>
@@ -146,7 +154,10 @@ export default function HurufVokalPage() {
                   <span>
                     {activeHuruf} — {item?.contoh}
                   </span>
-                  <EmojiOrImage value={item?.emoji ?? ""} size={(item?.emoji ?? '').startsWith('/') ? 56 : 36} />
+                  <EmojiOrImage
+                    value={item?.emoji ?? ""}
+                    size={(item?.emoji ?? "").startsWith("/") ? 56 : 36}
+                  />
                 </div>
                 <div className="text-sm text-gray-500 mt-1">
                   🔊 Sedang berbunyi...
@@ -155,7 +166,7 @@ export default function HurufVokalPage() {
             );
           })()
         ) : (
-          <div className="text-white text-center opacity-70 text-sm font-semibold">
+          <div className="text-center text-sm font-semibold" style={{ color: "#5C2D7A", opacity: 0.8 }}>
             👆 Tekan salah satu huruf vokal di atas!
           </div>
         )}
@@ -165,9 +176,10 @@ export default function HurufVokalPage() {
       <button
         onClick={() => !isPlaying && router.push("/menu")}
         disabled={isPlaying}
-        className="btn-game mt-4 relative z-10 px-6 py-3 rounded-full font-bold text-white text-sm"
+        className="btn-game mt-4 relative z-10 px-6 py-3 rounded-full font-bold text-sm"
         style={{
-          background: isPlaying ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.2)",
+          background: isPlaying ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.15)",
+          color: isPlaying ? "#aaa" : "#3B0764",
           opacity: isPlaying ? 0.5 : 1,
           cursor: isPlaying ? "not-allowed" : "pointer",
         }}>

@@ -164,7 +164,7 @@ export default function TebakHurufPage() {
         background: "url('/pictures/background.png') center/cover no-repeat",
       }}>
       {/* Overlay */}
-      <div className="absolute inset-0" style={{ background: "rgba(106,17,203,0.7)" }} />
+      <div className="absolute inset-0" style={{ background: "rgba(255,255,255,0.55)" }} />
       {/* Confetti */}
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">
@@ -186,8 +186,8 @@ export default function TebakHurufPage() {
       {/* Header */}
       <div className="relative z-10 text-center mb-4">
         <div className="text-4xl mb-1 animate-bounce-gentle">🎯</div>
-        <h1 className="text-2xl font-black text-white">Tebak Huruf A & O</h1>
-        <p className="text-blue-200 text-sm font-semibold">
+        <h1 className="text-2xl font-black" style={{ color: "#0D3B6B" }}>Tebak Huruf A & O</h1>
+        <p className="text-sm font-semibold" style={{ color: "#1A5A9E" }}>
           {currentIndex + 1} / {anggotaTubuhData.length} — Isi huruf yang
           hilang!
         </p>
@@ -318,9 +318,10 @@ export default function TebakHurufPage() {
       <button
         onClick={() => !isPlaying && router.push("/menu")}
         disabled={isPlaying}
-        className="btn-game mt-5 relative z-10 px-6 py-3 rounded-full font-bold text-white text-sm"
+        className="btn-game mt-5 relative z-10 px-6 py-3 rounded-full font-bold text-sm"
         style={{
-          background: isPlaying ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.2)",
+          background: isPlaying ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.15)",
+          color: isPlaying ? "#aaa" : "#0D3B6B",
           opacity: isPlaying ? 0.5 : 1,
           cursor: isPlaying ? "not-allowed" : "pointer",
         }}>
