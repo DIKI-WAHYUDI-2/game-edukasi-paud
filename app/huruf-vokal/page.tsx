@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { hurufVokalData } from "../../components/data";
+import PopupSelesai from "../../components/PopupSelesai";
 
 // Helper: kalau emoji berupa path gambar (mulai dengan /), render <img>, kalau tidak render teks
 function EmojiOrImage({ value, size = 32 }: { value: string; size?: number }) {
@@ -23,6 +24,8 @@ export default function HurufVokalPage() {
   const router = useRouter();
   const [activeHuruf, setActiveHuruf] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [sudahDiputar, setSudahDiputar] = useState<Set<string>>(new Set());
+  const [selesai, setSelesai] = useState(false);
 
   const playSound = (huruf: string) => {
     if (isPlaying) return;
@@ -38,12 +41,28 @@ export default function HurufVokalPage() {
     audio.onended = () => {
       setIsPlaying(false);
       setTimeout(() => setActiveHuruf(null), 300);
+      // Tandai huruf ini sudah diputar
+      setSudahDiputar((prev) => {
+        const next = new Set(prev);
+        next.add(huruf);
+        // Kalau semua 5 huruf sudah diputar, tampilkan popup selesai
+        if (next.size >= hurufVokalData.length) {
+          setTimeout(() => setSelesai(true), 400);
+        }
+        return next;
+      });
     };
 
     audio.onerror = () => {
       setIsPlaying(false);
       setTimeout(() => setActiveHuruf(null), 300);
     };
+  };
+
+  const handleMainLagi = () => {
+    setSudahDiputar(new Set());
+    setSelesai(false);
+    setActiveHuruf(null);
   };
 
   return (
@@ -95,6 +114,7 @@ export default function HurufVokalPage() {
                   ? `0 2px 0 ${item.warnaGelap}, 0 0 20px ${item.warna}`
                   : `0 6px 0 ${item.warnaGelap}`,
               transform: activeHuruf === item.huruf ? "translateY(4px)" : "",
+              outline: sudahDiputar.has(item.huruf) ? "3px solid white" : "none",
             }}>
             <span className="text-4xl">{item.huruf}</span>
             <EmojiOrImage value={item.emoji} size={item.emoji.startsWith('/') ? 52 : 28} />
@@ -134,11 +154,19 @@ export default function HurufVokalPage() {
 
       {/* Tombol Kembali */}
       <button
-        onClick={() => router.push("/menu")}
+        onClick={() => !isPlaying && router.push("/menu")}
+        disabled={isPlaying}
         className="btn-game mt-4 relative z-10 px-6 py-3 rounded-full font-bold text-white text-sm"
-        style={{ background: "rgba(255,255,255,0.2)" }}>
+        style={{
+          background: isPlaying ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.2)",
+          opacity: isPlaying ? 0.5 : 1,
+          cursor: isPlaying ? "not-allowed" : "pointer",
+        }}>
         ← Kembali ke Menu
       </button>
+
+      {/* Popup Selesai */}
+      <PopupSelesai show={selesai} onMainLagi={handleMainLagi} />
     </div>
   );
 }

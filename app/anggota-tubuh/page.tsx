@@ -2,30 +2,24 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { anggotaTubuhData } from "../../components/data";
+import { useTTS } from "../../components/useTTS";
+import PopupSelesai from "../../components/PopupSelesai";
 
 export default function AnggotaTubuhPage() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showAnim, setShowAnim] = useState(true);
+  const [selesai, setSelesai] = useState(false);
+  const { speak, isPlaying } = useTTS();
 
   const current = anggotaTubuhData[currentIndex];
   const isLast = currentIndex === anggotaTubuhData.length - 1;
 
-  const playSound = () => {
-    if (isPlaying) return;
-    setIsPlaying(true);
-    const utterance = new SpeechSynthesisUtterance(current.nama);
-    utterance.lang = "id-ID";
-    utterance.rate = 0.7;
-    utterance.pitch = 1.2;
-    utterance.onend = () => setIsPlaying(false);
-    speechSynthesis.speak(utterance);
-  };
+  const playSound = () => speak(current.nama);
 
   const goNext = () => {
     if (isLast) {
-      router.push("/mengeja-kata");
+      setSelesai(true);
       return;
     }
     setShowAnim(false);
@@ -44,6 +38,12 @@ export default function AnggotaTubuhPage() {
     }, 200);
   };
 
+  const handleMainLagi = () => {
+    setCurrentIndex(0);
+    setSelesai(false);
+    setShowAnim(true);
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden"
@@ -52,7 +52,7 @@ export default function AnggotaTubuhPage() {
       }}>
       {/* Header */}
       <div className="relative z-10 text-center mb-4">
-        <div className="text-4xl mb-1 animate-bounce-gentle">🧠</div>
+        <div className="text-4xl mb-1 animate-bounce-gentle">🫀</div>
         <h1 className="text-2xl font-black text-white">Anggota Tubuh</h1>
         <p className="text-green-100 text-sm font-semibold">
           {currentIndex + 1} / {anggotaTubuhData.length}
@@ -76,11 +76,17 @@ export default function AnggotaTubuhPage() {
       <div
         className={`relative z-10 card-game p-8 flex flex-col items-center w-full max-w-sm transition-all duration-200 ${showAnim ? "animate-pop-in" : "opacity-0"}`}
         style={{ background: "white" }}>
-        {/* Emoji besar */}
+        {/* Gambar anggota tubuh */}
         <div
-          className="text-9xl mb-4 animate-float"
+          className="mb-4 animate-float"
           style={{ filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.1))" }}>
-          {current.emoji}
+          <img
+            src={current.gambar}
+            alt={current.nama}
+            width={160}
+            height={160}
+            style={{ objectFit: "contain", width: 160, height: 160 }}
+          />
         </div>
 
         {/* Nama Indonesia */}
@@ -88,13 +94,6 @@ export default function AnggotaTubuhPage() {
           className="text-4xl font-black mb-1"
           style={{ color: current.warna }}>
           {current.nama}
-        </div>
-
-        {/* Deskripsi */}
-        <div
-          className="px-4 py-2 rounded-full text-sm font-bold text-white mb-6"
-          style={{ background: current.warna }}>
-          {current.deskripsi}
         </div>
 
         {/* Tombol Speaker */}
@@ -114,22 +113,25 @@ export default function AnggotaTubuhPage() {
         <div className="flex gap-3 w-full">
           <button
             onClick={goPrev}
-            disabled={currentIndex === 0}
+            disabled={currentIndex === 0 || isPlaying}
             className="btn-game flex-1 py-3 rounded-xl font-bold text-white text-sm"
             style={{
-              background: currentIndex === 0 ? "#ccc" : "#666",
-              boxShadow: currentIndex === 0 ? "none" : "0 4px 0 #333",
+              background: currentIndex === 0 || isPlaying ? "#ccc" : "#666",
+              boxShadow: currentIndex === 0 || isPlaying ? "none" : "0 4px 0 #333",
             }}>
             ← Sebelumnya
           </button>
           <button
             onClick={goNext}
+            disabled={isPlaying}
             className="btn-game flex-1 py-3 rounded-xl font-bold text-white text-sm"
             style={{
-              background: isLast
+              background: isPlaying
+                ? "#ccc"
+                : isLast
                 ? "linear-gradient(135deg, #F9A825, #E65100)"
                 : `linear-gradient(135deg, ${current.warna}, #222)`,
-              boxShadow: `0 4px 0 #222`,
+              boxShadow: isPlaying ? "none" : `0 4px 0 #222`,
             }}>
             {isLast ? "Lanjut →" : "Berikutnya →"}
           </button>
@@ -138,11 +140,19 @@ export default function AnggotaTubuhPage() {
 
       {/* Kembali */}
       <button
-        onClick={() => router.push("/menu")}
+        onClick={() => !isPlaying && router.push("/menu")}
+        disabled={isPlaying}
         className="btn-game mt-5 relative z-10 px-6 py-3 rounded-full font-bold text-white text-sm"
-        style={{ background: "rgba(0,0,0,0.2)" }}>
+        style={{
+          background: isPlaying ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.2)",
+          opacity: isPlaying ? 0.5 : 1,
+          cursor: isPlaying ? "not-allowed" : "pointer",
+        }}>
         ← Kembali ke Menu
       </button>
+
+      {/* Popup Selesai */}
+      <PopupSelesai show={selesai} onMainLagi={handleMainLagi} />
     </div>
   );
 }

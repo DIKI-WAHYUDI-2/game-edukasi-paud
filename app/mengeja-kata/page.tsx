@@ -2,68 +2,35 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { anggotaTubuhData } from "../../components/data";
+import { useTTS } from "../../components/useTTS";
+import PopupSelesai from "../../components/PopupSelesai";
 
 export default function MengejaKataPage() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [activeSuku, setActiveSuku] = useState<number | null>(null);
   const [showAnim, setShowAnim] = useState(true);
+  const [selesai, setSelesai] = useState(false);
+  const { speak, speakSequence, isPlaying } = useTTS();
 
   const current = anggotaTubuhData[currentIndex];
   const isLast = currentIndex === anggotaTubuhData.length - 1;
 
   const playSuku = (suku: string, index: number) => {
     if (isPlaying) return;
-    setIsPlaying(true);
     setActiveSuku(index);
-
-    const utterance = new SpeechSynthesisUtterance(suku);
-    utterance.lang = "id-ID";
-    utterance.rate = 0.5;
-    utterance.pitch = 1.2;
-    utterance.onend = () => {
-      setActiveSuku(null);
-      setIsPlaying(false);
-    };
-    speechSynthesis.speak(utterance);
+    speak(suku);
+    setTimeout(() => setActiveSuku(null), 1200);
   };
 
   const playFullWord = () => {
     if (isPlaying) return;
-    setIsPlaying(true);
-
-    // Ucapkan satu per satu suku kata
-    let i = 0;
-    const speakNext = () => {
-      if (i < current.sukuKata.length) {
-        setActiveSuku(i);
-        const u = new SpeechSynthesisUtterance(current.sukuKata[i]);
-        u.lang = "id-ID";
-        u.rate = 0.5;
-        u.pitch = 1.2;
-        u.onend = () => {
-          i++;
-          setTimeout(speakNext, 200);
-        };
-        speechSynthesis.speak(u);
-      } else {
-        setActiveSuku(null);
-        // Ucapkan kata utuh
-        const full = new SpeechSynthesisUtterance(`jadi... ${current.nama}`);
-        full.lang = "id-ID";
-        full.rate = 0.7;
-        full.pitch = 1.2;
-        full.onend = () => setIsPlaying(false);
-        speechSynthesis.speak(full);
-      }
-    };
-    speakNext();
+    speakSequence([...current.sukuKata, `jadi... ${current.nama}`], 400);
   };
 
   const goNext = () => {
     if (isLast) {
-      router.push("/tebak-huruf");
+      setSelesai(true);
       return;
     }
     setShowAnim(false);
@@ -80,6 +47,12 @@ export default function MengejaKataPage() {
       setCurrentIndex((prev) => prev - 1);
       setShowAnim(true);
     }, 200);
+  };
+
+  const handleMainLagi = () => {
+    setCurrentIndex(0);
+    setSelesai(false);
+    setShowAnim(true);
   };
 
   return (
@@ -114,8 +87,16 @@ export default function MengejaKataPage() {
       <div
         className={`relative z-10 card-game p-8 flex flex-col items-center w-full max-w-sm ${showAnim ? "animate-pop-in" : "opacity-0"}`}
         style={{ background: "white" }}>
-        {/* Emoji */}
-        <div className="text-8xl mb-3 animate-float">{current.emoji}</div>
+        {/* Gambar anggota tubuh */}
+        <div className="mb-3 animate-float">
+          <img
+            src={current.gambar}
+            alt={current.nama}
+            width={120}
+            height={120}
+            style={{ objectFit: "contain", width: 120, height: 120 }}
+          />
+        </div>
 
         {/* Nama lengkap */}
         <div
@@ -142,11 +123,7 @@ export default function MengejaKataPage() {
               {suku}
             </button>
           ))}
-
-          {/* Simbol + dan kata utuh */}
-          <span className="self-center text-gray-400 font-black text-xl">
-            =
-          </span>
+          <span className="self-center text-gray-400 font-black text-xl">=</span>
           <div
             className="px-4 py-2 rounded-xl font-black text-lg"
             style={{ background: "#f0f0f0", color: current.warna }}>
@@ -171,34 +148,46 @@ export default function MengejaKataPage() {
         <div className="flex gap-3 w-full">
           <button
             onClick={goPrev}
-            disabled={currentIndex === 0}
+            disabled={currentIndex === 0 || isPlaying}
             className="btn-game flex-1 py-3 rounded-xl font-bold text-white text-sm"
             style={{
-              background: currentIndex === 0 ? "#ccc" : "#777",
-              boxShadow: "0 4px 0 #333",
+              background: currentIndex === 0 || isPlaying ? "#ccc" : "#777",
+              boxShadow: currentIndex === 0 || isPlaying ? "none" : "0 4px 0 #333",
             }}>
             ← Sebelumnya
           </button>
           <button
             onClick={goNext}
+            disabled={isPlaying}
             className="btn-game flex-1 py-3 rounded-xl font-bold text-white text-sm"
             style={{
-              background: isLast
+              background: isPlaying
+                ? "#ccc"
+                : isLast
                 ? "linear-gradient(135deg, #AB47BC, #6A1B9A)"
                 : `linear-gradient(135deg, ${current.warna}, #222)`,
-              boxShadow: "0 4px 0 #222",
+              boxShadow: isPlaying ? "none" : "0 4px 0 #222",
             }}>
             {isLast ? "Lanjut →" : "Berikutnya →"}
           </button>
         </div>
       </div>
 
+      {/* Kembali */}
       <button
-        onClick={() => router.push("/menu")}
+        onClick={() => !isPlaying && router.push("/menu")}
+        disabled={isPlaying}
         className="btn-game mt-5 relative z-10 px-6 py-3 rounded-full font-bold text-white text-sm"
-        style={{ background: "rgba(0,0,0,0.2)" }}>
+        style={{
+          background: isPlaying ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.2)",
+          opacity: isPlaying ? 0.5 : 1,
+          cursor: isPlaying ? "not-allowed" : "pointer",
+        }}>
         ← Kembali ke Menu
       </button>
+
+      {/* Popup Selesai */}
+      <PopupSelesai show={selesai} onMainLagi={handleMainLagi} />
     </div>
   );
 }
